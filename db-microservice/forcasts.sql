@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users, forecasts;
 
 CREATE TABLE users (
     user_id INT GENERATED ALWAYS AS IDENTITY,
@@ -9,10 +9,12 @@ CREATE TABLE users (
     PRIMARY KEY (user_id)
 );
 
-CREATE TABLE IF NOT EXISTS forecasts (
-    id SERIAL PRIMARY KEY,
-    location VARCHAR(100) NOT NULL,
-    timestamp TIMESTAMPTZ NOT NULL,
-    cloud_coverage DECIMAL NOT NULL,
-    estimated_energy DECIMAL NOT NULL
+CREATE TABLE forecasts (
+    forcast_id INT GENERATED ALWAYS AS IDENTITY,
+    dateAndTime VARCHAR(25),
+    enestimatedEnergy DECIMAL(50,5),
+    windEnergy DECIMAL(50,5),
+    solarEnergy DECIMAL(50,5),
+    PRIMARY KEY (forcast_id)
 );
+
