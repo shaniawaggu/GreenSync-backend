@@ -1,6 +1,6 @@
 version: '3.9'
 services:
-  forcast-mvc:
+  forecast-mvc:
     image: htflynn/forecast-mvc:0.0.1.RELEASE
     ports:
       - "3000:3000"
@@ -16,7 +16,7 @@ services:
       DB_PASSWORD: docker
       DB_PORT: 5432
 
-  forcast-db:
+  forecast-db:
     image: htflynn/forecast-db:0.0.1.RELEASE
     ports:
       - "5432:5432"

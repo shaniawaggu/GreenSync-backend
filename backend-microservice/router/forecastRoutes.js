@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const forecastRouter = Router();
-const forecastController = require('../controllers/forecstController');
+const forecastController = require('../controllers/forecastController');
 
 //define routes
 
@@ -9,7 +9,7 @@ const forecastController = require('../controllers/forecstController');
 forecastRouter.post('/update', forecastController.create);
 
 //dashboard show (get) -> weekly data
-forecastRouter.get('/', authenticator, forecastRouter.index)
+forecastRouter.get('/', forecastController.index);
 
 
 

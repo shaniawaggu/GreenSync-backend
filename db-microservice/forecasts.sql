@@ -5,6 +5,7 @@ CREATE TABLE users (
     name VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
     password_hash VARCHAR(100) NOT NULL,
+    postcode VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- should be created automatically
     PRIMARY KEY (user_id)
 );
@@ -15,6 +16,6 @@ CREATE TABLE forecasts (
     estimatedEnergy DECIMAL(50,5),
     windEnergy DECIMAL(50,5),
     solarEnergy DECIMAL(50,5),
-    PRIMARY KEY (forcast_id)
+    PRIMARY KEY (forecast_id)
 );
 

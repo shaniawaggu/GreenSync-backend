@@ -20,7 +20,7 @@ async function create(req, res) {
 async function login(req,res){
   const data = req.body;
     try{
-        const user = await Users.getUserByEmail(data.email)
+        const user = await Users.getUserByUserName(data.username)
         const match = await bcrypt.compare(data.password, user.passwordHash)
         if(match){
             // console.log(user);

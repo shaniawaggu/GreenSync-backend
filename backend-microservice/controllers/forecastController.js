@@ -11,7 +11,9 @@ async function create(req, res) {
   }
 
   async function index(req, res) {
+    console.log("t1");
     try {
+        console.log("t2");
         const energyForecats = await Forecast.getAll();
         res.status(200).json(energyForecats);
   } catch (err) {
@@ -19,4 +21,4 @@ async function create(req, res) {
   }
 }
 
-  module.exports = { create, index }
+  module.exports = { index, create }

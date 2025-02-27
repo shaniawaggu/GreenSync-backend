@@ -1,9 +1,9 @@
 const db = require('../db/connect');
 
 class Forecast {
-    constructor({ forecast_id, dateAndTime, estimatedenergy, windenergy, solarenergy }) {
+    constructor({ forecast_id, dateandtime, estimatedenergy, windenergy, solarenergy }) {
         (this.forecast_id = forecast_id),
-        (this.dateAndTime = dateAndTime),
+        (this.dateandtime = dateandtime),
         (this.estimatedenergy = estimatedenergy),
         (this.windenergy = windenergy),
         (this.solarenergy = solarenergy);
@@ -82,7 +82,7 @@ class Forecast {
                 * (1 - (0.75 * (results[2].data.hourly.cloud_cover[i] / 100))))
                 expectedExport[i] = windspeed + expectedSolarExport[i]
                 let response = await db.query(
-                    'INSERT INTO forecasts (dateAndTime, enestimatedEnergy, windEnergy, solarEnergy) VALUES ($1, $2, $3, $4) RETURNING *;',
+                    'INSERT INTO forecasts (dateAndTime, estimatedEnergy, windEnergy, solarEnergy) VALUES ($1, $2, $3, $4) RETURNING *;',
                     [results[0].data.hourly.time[i], expectedExport[i], windspeed, expectedSolarExport[i]]
                   );
                   

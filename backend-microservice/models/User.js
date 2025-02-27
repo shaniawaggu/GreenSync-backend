@@ -11,17 +11,17 @@ class Users {
 
   // Create new User
   static async create(data) {
-    const { name, email, password } = data;
+    const { username, email, password, postcode } = data;
     const existingUser = await db.query(
-      'SELECT * FROM users WHERE LOWER(email) = LOWER($1);',
-      [email]
+      'SELECT * FROM users WHERE LOWER(name) = LOWER($1);',
+      [username]
     );
     if (existingUser.rows.length === 1) {
       throw Error('A user with this email already exists');
     } else {
       let response = await db.query(
-        'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING *;',
-        [name, email, password]
+        'INSERT INTO users (name, email, password_hash, postcode) VALUES ($1, $2, $3, $4) RETURNING *;',
+        [username, email, password, postcode]
       );
       return new Users(response.rows[0]);
     }
@@ -39,9 +39,9 @@ class Users {
     }
   }
 
-  static async getUserByEmail(email) {
-    const response = await db.query('SELECT * FROM users WHERE email = $1', [
-      email,
+  static async getUserByUserName(username) {
+    const response = await db.query('SELECT * FROM users WHERE name = $1', [
+      username,
     ]);
     if (response.rows.length !== 1) {
       throw Error('Unable to find the user!');
