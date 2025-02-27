@@ -1,5 +1,5 @@
 FROM postgres
 ENV POSTGRES_PASSWORD docker
-ENV POSTGRES_DB forcast
+ENV POSTGRES_DB forecast
 EXPOSE 5432
-COPY forcasts.sql /docker-entrypoint-initdb.d/
+COPY forecasts.sql /docker-entrypoint-initdb.d/

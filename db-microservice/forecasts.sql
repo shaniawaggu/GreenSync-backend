@@ -10,9 +10,9 @@ CREATE TABLE users (
 );
 
 CREATE TABLE forecasts (
-    forcast_id INT GENERATED ALWAYS AS IDENTITY,
+    forecast_id INT GENERATED ALWAYS AS IDENTITY,
     dateAndTime VARCHAR(25),
-    enestimatedEnergy DECIMAL(50,5),
+    estimatedEnergy DECIMAL(50,5),
     windEnergy DECIMAL(50,5),
     solarEnergy DECIMAL(50,5),
     PRIMARY KEY (forcast_id)
