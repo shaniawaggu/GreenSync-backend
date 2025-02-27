@@ -1,13 +1,21 @@
 const db = require('../db/connect');
 
 class Forecast {
-    // constructor({ user_id, name, email, password_hash, created_at }) {
-    //     this.id = user_id;
-    //     this.name = name;
-    //     this.email = email;
-    //     this.passwordHash = password_hash;
-    //     this.created_at = created_at;
-    // }
+    constructor({ forecast_id, dateAndTime, estimatedenergy, windenergy, solarenergy }) {
+        (this.forecast_id = forecast_id),
+        (this.dateAndTime = dateAndTime),
+        (this.estimatedenergy = estimatedenergy),
+        (this.windenergy = windenergy),
+        (this.solarenergy = solarenergy);
+    }
+    static async getAll(){
+        const response = await db.query("SELECT * FROM forecasts;");
+        if (response.rows.length == 0) {
+            throw Error("No forecasts found!");
+        } else {
+            return response.rows.map((el) => new Forecast(el));
+        }
+    }
     static async create(){
         const locations = [
             { latitude: 51.51836002, longitude: -0.119866225 },
@@ -55,6 +63,7 @@ class Forecast {
             let expectedExport = []
             let windspeed = 0
             let windfactor = 0
+
             db.query('TRUNCATE TABLE forecasts');
             for(let i = 0; i < 168; i++){
                 if (data.hourly.wind_speed_120m[i] < 3){
