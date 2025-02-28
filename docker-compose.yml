@@ -15,6 +15,8 @@ services:
       DB_NAME: forecast
       DB_PASSWORD: docker
       DB_PORT: 5432
+      SECRET_TOKEN: A8F4F4425AF16F49D2647B01D30D9355AB867C630C7640BF2E697B591634E4C5
+      BCRYPT_SALT_ROUNDS: 10
 
   forecast-db:
     image: htflynn/forecast-db:0.0.1.RELEASE

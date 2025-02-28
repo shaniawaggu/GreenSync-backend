@@ -23,9 +23,9 @@ async function login(req,res){
         const user = await Users.getUserByUserName(data.username)
         const match = await bcrypt.compare(data.password, user.passwordHash)
         if(match){
-            // console.log(user);
+            console.log(user);
             const payload = {username: user.id}
-            // console.log(payload.username);
+            // console.log(token);
             const sendToken = (err, token) => {
                 if(err){
                     throw Error("Error in token generation")

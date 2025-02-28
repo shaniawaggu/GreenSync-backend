@@ -17,7 +17,7 @@ class Users {
       [username]
     );
     if (existingUser.rows.length === 1) {
-      throw Error('A user with this email already exists');
+      throw Error('A user with this name already exists');
     } else {
       let response = await db.query(
         'INSERT INTO users (name, email, password_hash, postcode) VALUES ($1, $2, $3, $4) RETURNING *;',
