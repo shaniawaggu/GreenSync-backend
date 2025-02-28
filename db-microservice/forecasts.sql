@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS users, forecasts;
+DROP TABLE IF EXISTS users, forecasts, evcharginglocations, activepowerdata;
 
 CREATE TABLE users (
     user_id INT GENERATED ALWAYS AS IDENTITY,
@@ -19,14 +19,54 @@ CREATE TABLE forecasts (
     PRIMARY KEY (forecast_id)
 );
 
-CREATE TABLE ActivePowerData (
+CREATE TABLE evcharginglocations (
+    ev_location_id INT GENERATED ALWAYS AS IDENTITY,
+    licence_area VARCHAR(50),
+    primary_name VARCHAR(100),
+    latitude DECIMAL(10,8),
+    longitude DECIMAL(11,8),
+    PRIMARY KEY (ev_location_id)
+);
+
+INSERT INTO evcharginglocations (licence_area, primary_name, latitude, longitude) VALUES
+('London', 'ABERDEEN PL A 11KV', 51.52543793, -0.174571249),
+('London', 'AMBERLEY RD 11KV', 51.5227947, -0.192609179),
+('London', 'BROADWAY', 51.45698013, 0.136612148),
+('London', 'BROMLEY SOUTH', 51.39143917, 0.037681542),
+('London', 'BULWER ST 11KV', 51.50558654, -0.223434838),
+('London', 'DURNSFORD RD', 51.43028908, -0.191457168),
+('London', 'EDWARDS LANE C', 51.56180188, -0.08313163),
+('London', 'ELTHAM GRID 11KV', 51.45968102, 0.078421609),
+('London', 'EPPING NEW RD', 51.62713761, 0.029948701),
+('London', 'FAIRLOP RD', 51.59318478, 0.084149694),
+('London', 'FOREST HILL', 51.4471513, -0.061010888),
+('London', 'FULHAM PALACE RD C', 51.49063472, -0.221826595),
+('London', 'GORRINGE PARK', 51.41141613, -0.156410406),
+('London', 'HACKNEY C 6.6KV', 51.55844987, -0.040801025),
+('London', 'HOLLOWAY 11KV', 51.55251155, -0.115818726),
+('London', 'LITHOS RD A', 51.54880641, -0.185982309),
+('London', 'MERTON', 51.41015176, -0.189519773),
+('London', 'MONTFORD PL B 11KV', 51.48554561, -0.113668954),
+('London', 'SEWELL RD B 11KV', 51.49750861, 0.112429403),
+('London', 'SILVERTOWN B 11KV', 51.50357514, 0.043616863),
+('London', 'SIMPSONS ROAD', 51.50819934, -0.017263323),
+('London', 'TOWNMEAD B 11KV', 51.46837976, -0.186107199),
+('London', 'WANDSWORTH CENTRAL A', 51.45361274, -0.193011178),
+('London', 'WINLATON RD', 51.42731487, -0.001145339),
+('London', 'WEST NORWOOD', 51.43024631, -0.103963971),
+('London', 'ABERDEEN PL B 11KV', 51.52542175, -0.174687223),
+('London', 'AXE ST', 51.53576243, 0.07980945),
+('London', 'BARKING WEST 11KV', 51.51613778, 0.107151163),
+('London', 'BENGEWORTH RD 11KV', 51.46731219, -0.096639982);
+
+CREATE TABLE activepowerdata (
     active_power_id INT GENERATED ALWAYS AS IDENTITY,
-    date_time DATETIME,
+    date_time TIMESTAMP,
     active_power_avg FLOAT,
     PRIMARY KEY (active_power_id)
 );
 
-INSERT INTO ActivePowerData (date_time, active_power_avg) VALUES
+INSERT INTO activepowerdata (date_time, active_power_avg) VALUES
 ('2025-01-13 00:00:00', 12244.35),
 ('2025-01-13 01:00:00', 9069.11),
 ('2025-01-13 02:00:00', 8740.25),

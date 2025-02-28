@@ -13,7 +13,7 @@ class Charging {
         if (response.rows.length == 0) {
             throw Error("No forecasts found!");
         } else {
-            return response.rows.map((el) => new Forecast(el));
+            return response.rows.map((el) => new Charging(el));
         }
     }
     // static async create(){
