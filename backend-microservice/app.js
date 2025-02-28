@@ -5,7 +5,7 @@ const cors = require('cors')
 const logger = require('./logger')
 const forecastRouter = require('./router/forecastRoutes')
 const userRouter = require('./router/userRoutes')
-
+const chargingRouter = require('./router/chargingRoutes')
 
 const app = express()
 
@@ -21,5 +21,6 @@ app.get("/", (req, res) => {
 
 app.use('/forecasts', forecastRouter)
 app.use('/user', userRouter)
+app.use('/charging', chargingRouter)
 
 module.exports = app

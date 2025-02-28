@@ -10,7 +10,7 @@ forecastRouter.post('/update', forecastController.create);
 
 //dashboard show (get) -> weekly data
 forecastRouter.get('/', forecastController.index);
-
+// forecastRouter.get('/charging-points', forecastController.)
 
 
 
