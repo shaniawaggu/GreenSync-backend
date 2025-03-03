@@ -113,8 +113,9 @@ class Forecast {
 
         // return response.rows.map((el) => new Forecast(el));
     }
-    Windows.generateWindows(powerdata, forcastdata)
-
+    
+    let peakToatals = Windows.generateWindows(powerdata, forcastdata)
+    return peakToatals
     }
 
 }

@@ -35,7 +35,7 @@ class Users {
     if (response.rows.length !== 1) {
       throw Error('Unable to find the user!');
     } else {
-      return new Users(response.rows[0]);
+      return response.rows[0];
     }
   }
 
