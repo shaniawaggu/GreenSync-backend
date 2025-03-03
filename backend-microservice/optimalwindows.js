@@ -1,105 +1,83 @@
-function generateWindows(powerdata, renweabledata) {
-    // console.log(powerdata, renweabledata);
-    // console.log(renweabledata[0].dateandtime);
-    let current_date = getDayOfWeek(renweabledata[0].dateandtime)
-    let peakTotals
-    console.log(current_date);
-    if(current_date == 'Monday'){
-        peakTotals = Monday(powerdata, renweabledata)
-    }else if(current_date == 'Tuesday'){
-        Tuesday(powerdata, renweabledata)
+function generateWindows(powerdata, renewabledata) {
+    // Days of the week array starting with Monday
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  
+    // get day name from a timestamp
+    function getDayName(timestamp) {
+      const date = new Date(timestamp);
+      return days[(date.getUTCDay() + 6) % 7]; // Adjust since JS getUTCDay() returns 0 for Sunday
     }
-    else if(current_date == 'Tuesday'){
-        Wednesday(powerdata, renweabledata)
+  
+    // Determine the offset.
+    // renewabledata[0] is the current day (e.g., Tuesday 00:00),
+    // while powerdata[0] is always Monday 00:00.
+    // So if renewabledata starts on Tuesday, offset = 24 (i.e. Tuesday in powerdata is at index 24).
+    let renewableStartDay = getDayName(renewabledata[0].dateandtime);
+    let offset = days.indexOf(renewableStartDay) * 24;
+  
+    // Initialize best window records: weekly and for each day.
+    const bestWindows = {
+      Weekly: { startTime: null, score: -Infinity },
+      Monday: { startTime: null, score: -Infinity },
+      Tuesday: { startTime: null, score: -Infinity },
+      Wednesday: { startTime: null, score: -Infinity },
+      Thursday: { startTime: null, score: -Infinity },
+      Friday: { startTime: null, score: -Infinity },
+      Saturday: { startTime: null, score: -Infinity },
+      Sunday: { startTime: null, score: -Infinity },
+    };
+  
+    // Calculate the best weekly 3-hour window.
+    // For each possible 3-hour window in renewabledata, compute the score by summing:
+    // estimatedenergy / corresponding powerdata.active_power_avg,
+    
+    for (let i = 0; i <= renewabledata.length - 3; i++) {
+      let windowScore = 0;
+      for (let j = 0; j < 3; j++) {
+        let powerIndex = (i + j + offset) % powerdata.length;
+        windowScore += renewabledata[i + j].estimatedenergy / powerdata[powerIndex].active_power_avg;
+      }
+      if (windowScore > bestWindows.Weekly.score) {
+        bestWindows.Weekly.score = windowScore;
+        bestWindows.Weekly.startTime = renewabledata[i].dateandtime;
+      }
     }
-    else if(current_date == 'Tuesday'){
-        Thurday(powerdata, renweabledata)
+  
+    // Calculate the best 3-hour window for each day.
+    // Here we ensure that when mapping renewabledata indices to powerdata using the offset,
+    // all three hours belong to the same day in the powerdata.
+    for (let i = 0; i <= renewabledata.length - 3; i++) {
+      // Determine the day for the first hour of the window (from powerdata perspective)
+      let powerIndex0 = (i + offset) % powerdata.length;
+      let dayName = getDayName(powerdata[powerIndex0].date_time);
+      
+      // Check that the next two hours in the window are on the same day
+      let powerIndex1 = (i + 1 + offset) % powerdata.length;
+      let powerIndex2 = (i + 2 + offset) % powerdata.length;
+      if (
+        getDayName(powerdata[powerIndex1].date_time) !== dayName ||
+        getDayName(powerdata[powerIndex2].date_time) !== dayName
+      ) {
+        continue; // Skip this window if it spans two days in powerdata
+      }
+      
+      // Compute the window score
+      let windowScore = 0;
+      for (let j = 0; j < 3; j++) {
+        let pIndex = (i + j + offset) % powerdata.length;
+        windowScore += renewabledata[i + j].estimatedenergy / powerdata[pIndex].active_power_avg;
+      }
+      
+      // Update the best window for this day if necessary
+      if (windowScore > bestWindows[dayName].score) {
+        bestWindows[dayName].score = windowScore;
+        bestWindows[dayName].startTime = renewabledata[i].dateandtime;
+      }
     }
-    else if(current_date == 'Tuesday'){
-        Friday(powerdata, renweabledata)
-    }
-    else if(current_date == 'Tuesday'){
-        Saturday(powerdata, renweabledata)
-    }else{
-        Sunday(powerdata, renweabledata)
-    }
-    return peakTotals
+  
+    return bestWindows;
+  }
 
-}
-
-function getDayOfWeek(timestamp) {
-    // Create a new Date object from the timestamp
-    let date = new Date(timestamp);
-
-    // Array of days of the week
-    const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-    // Get the day of the week (0 = Sunday, 6 = Saturday)
-    let dayIndex = date.getUTCDay(); // Using UTC to avoid timezone issues
-
-    // Convert JavaScript's Sunday-starting index to Monday-starting
-    return daysOfWeek[(dayIndex + 6) % 7]; 
-}
-function Monday(powerdata, renweabledata){
-    let currentHighestTotal =-10000000
-    let currentHighestTotalTime = {Weekly: "", Monday: "", Tuesday: "", Wednesday: "", Thurday: "", Friday: "", Saturday: "", Sunday: ""}
-    //weekly highest
-    for(let i=0; i < 165; i++){
-        // console.log(`t ${i}`);
-        hourlyAmount = (renweabledata[i].estimatedenergy / powerdata[i + 1].active_power_avg)
-         + (renweabledata[i + 1].estimatedenergy / powerdata[i + 2].active_power_avg) 
-          + (renweabledata[i + 2].estimatedenergy / powerdata[i + 3].active_power_avg);
-        // console.log(hourlyAmount);
-        if (hourlyAmount > currentHighestTotal){
-            currentHighestTotal = hourlyAmount
-            currentHighestTotalTime.Weekly = renweabledata[i].dateandtime
-        }
-        // console.log(currentHighestTotalTime)
-    }
-    //monday highest total
-    currentHighestTotal =-10000000
-    for(let i=0; i < 21; i++){
-        // console.log(`t ${i}`);
-        hourlyAmount = (renweabledata[i].estimatedenergy / powerdata[i + 1].active_power_avg)
-         + (renweabledata[i + 1].estimatedenergy / powerdata[i + 2].active_power_avg) 
-          + (renweabledata[i + 2].estimatedenergy / powerdata[i + 3].active_power_avg);
-        console.log(hourlyAmount, renweabledata[i].dateandtime, powerdata[i+1].date_time);
-        if (hourlyAmount > currentHighestTotal){
-            currentHighestTotal = hourlyAmount
-            currentHighestTotalTime.Monday = renweabledata[i].dateandtime
-        }
-        console.log(currentHighestTotalTime)
-    }
-    //Tuesday highest total
-    currentHighestTotal =-10000000
-    for(let i=0; i < 22; i++){
-        console.log(`t ${i}`);
-        hourlyAmount = (renweabledata[i+23].estimatedenergy / powerdata[i + 24].active_power_avg)
-         + (renweabledata[i + 24].estimatedenergy / powerdata[i + 25].active_power_avg) 
-          + (renweabledata[i + 26].estimatedenergy / powerdata[i + 27].active_power_avg);
-        console.log(hourlyAmount, renweabledata[i+23].dateandtime, powerdata[i+24].date_time);
-        if (hourlyAmount > currentHighestTotal){
-            currentHighestTotal = hourlyAmount
-            currentHighestTotalTime.Tuesday = renweabledata[i+23].dateandtime
-        }
-        console.log(currentHighestTotalTime)
-    }
-    //Wednesday highest total
-    currentHighestTotal =-10000000
-    for(let i=0; i < 22; i++){
-        console.log(`t ${i}`);
-        hourlyAmount = (renweabledata[i+47].estimatedenergy / powerdata[i + 48].active_power_avg)
-         + (renweabledata[i + 48].estimatedenergy / powerdata[i + 49].active_power_avg) 
-          + (renweabledata[i + 49].estimatedenergy / powerdata[i + 50].active_power_avg);
-        console.log(hourlyAmount, renweabledata[i+47].dateandtime, powerdata[i+48].date_time);
-        if (hourlyAmount > currentHighestTotal){
-            currentHighestTotal = hourlyAmount
-            currentHighestTotalTime.Wednesday = renweabledata[i+47].dateandtime
-        }
-        console.log(currentHighestTotalTime)
-    }
-    return currentHighestTotalTime
-}
 
 
 module.exports = { generateWindows }
