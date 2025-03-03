@@ -10,6 +10,7 @@ forecastRouter.post('/update', forecastController.create);
 
 //dashboard show (get) -> weekly data
 forecastRouter.get('/', forecastController.index);
+forecastRouter.get('/optimal-windows', forecastController.windows)
 // forecastRouter.get('/charging-points', forecastController.)
 
 

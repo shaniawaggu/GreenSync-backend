@@ -53,7 +53,7 @@ async function login(req,res){
 async function show(req, res) {
   try {
     let id = req.params.id;
-    const user = await Users.getUserById(id);
+    const user = await Users.getPostcodeById(id);
     res.status(200).json(user);
   } catch (err) {
     res.status(404).json({ error: err.message });

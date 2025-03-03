@@ -28,8 +28,8 @@ class Users {
   }
 
   // Get one user by Id
-  static async getUserById(id) {
-    const response = await db.query('SELECT * FROM users WHERE user_id = $1', [
+  static async getPostcodeById(id) {
+    const response = await db.query('SELECT postcode FROM users WHERE user_id = $1', [
       id,
     ]);
     if (response.rows.length !== 1) {

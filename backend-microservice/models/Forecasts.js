@@ -1,4 +1,5 @@
 const db = require('../db/connect');
+const Windows = require('../optimalwindows')
 
 class Forecast {
     constructor({ forecast_id, dateandtime, estimatedenergy, windenergy, solarenergy }) {
@@ -89,10 +90,33 @@ class Forecast {
                 
                 // console.log(`At ${results[0].data.hourly.time[i]} the expected renweable generation is ${expectedExport[i]}`);  
             }
-            return ("YEAH BUDDY");
+            return ("");
             
             // You can now perform your calculations with the `results` variable.
     }
+    static async getWindows(){
+      let powerdata
+      let forcastdata
+      let response = await db.query("SELECT * FROM forecasts;");
+      if (response.rows.length == 0) {
+          throw Error("No forecasts found!");
+      } else {
+          //console.log(response.rows);
+          forcastdata =  response.rows
+          // return response.rows.map((el) => new Forecast(el));
+      }
+      response = await db.query("SELECT * FROM activepowerdata;");
+      if (response.rows.length == 0) {
+        throw Error("No forecasts found!");
+    } else {
+        powerdata =  response.rows
+
+        // return response.rows.map((el) => new Forecast(el));
+    }
+    Windows.generateWindows(powerdata, forcastdata)
+
+    }
+
 }
 
 
