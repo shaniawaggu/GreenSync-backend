@@ -1,40 +1,32 @@
 provider "azurerm" {
+  //version = "~>2.0.0"
   features {}
-  subscription_id = "ff8cc0ac-8ae4-49df-b42c-741ae642a6a5"
+  client_id       = var.client_id   # ENVIRONMENT VARIABLE
+  client_secret   = var.client_secret # ENVIRONMENT VARIABLE
+  subscription_id = var.subscription_id
+  tenant_id       = var.tenant_id
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "myResourceGroup"
-  location = "uksouth"
+resource "azurerm_resource_group" "resource_group" {
+  name     = "${var.resource_group}_${var.environment}"
+  location = var.location
+  tags = {
+    environment = var.environment
+  }
 }
 
-resource "azurerm_container_group" "aci" {
-  name                = "myContainerGroup"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  os_type             = "Linux"
-  ip_address_type     = "Public"
-  dns_name_label      = "greensyncid"  # must be globally unique
-
-  container {
-    name   = "mvc"
-    image  = "htflynn/forecast-mvc:latest"
-    cpu    = "0.5"
-    memory = "1.5"
-    ports {
-      port     = 80
-      protocol = "TCP"
-    }
+resource "azurerm_storage_account" "storage_account" {
+  name                     = "${var.environment}terraformstatestorage"
+  location                 = var.location
+  resource_group_name      = azurerm_resource_group.resource_group.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+  tags = {
+    environment = var.environment
   }
+}
 
-  container {
-    name   = "database"
-    image  = "htflynn/forecast-db:latest"
-    cpu    = "0.5"
-    memory = "1.5"
-    ports {
-      port     = 3306
-      protocol = "TCP"
-    }
-  }
+resource "azurerm_storage_container" "storage_container" {
+  name                  = "${var.environment}terraformstatestoragecontainer"
+  storage_account_name  = azurerm_storage_account.storage_account.name
 }

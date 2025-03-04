@@ -1,82 +1,86 @@
 function generateWindows(powerdata, renewabledata) {
-    // Days of the week array starting with Monday
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  
-    // get day name from a timestamp
-    function getDayName(timestamp) {
-      const date = new Date(timestamp);
-      return days[(date.getUTCDay() + 6) % 7]; // Adjust since JS getUTCDay() returns 0 for Sunday
+  // Assume both arrays have 168 items (one for each hour of the week)
+  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  // Compute offset:
+  // renewabledata[0].dateandtime is the start of renewable data (e.g. Wednesday 00:00)
+  // Determine its day index in our system (Monday=0, Tuesday=1, etc.)
+  const renewableStartDate = new Date(renewabledata[0].dateandtime);
+  let renewableDayIndex = (renewableStartDate.getUTCDay() + 6) % 7; // Adjust since JS: Sunday=0
+  // The matching powerdata hour for renewabledata[0] is (renewableDayIndex * 24)
+  let offset = renewableDayIndex * 24;
+
+  // Create an aligned array for renewabledata so that:
+  // alignedRenewable[i] corresponds to the same hour as powerdata[i]
+  const alignedRenewable = new Array(168);
+  for (let i = 0; i < renewabledata.length; i++) {
+    // Using modulo ensures proper wrap-around
+    let targetIndex = (i + offset) % 168;
+    alignedRenewable[targetIndex] = renewabledata[i];
+  }
+
+  // Initialize best window records for the whole week and each day.
+  const bestWindows = {
+    Weekly: { startTime: null, score: -Infinity },
+    Monday: { startTime: null, score: -Infinity },
+    Tuesday: { startTime: null, score: -Infinity },
+    Wednesday: { startTime: null, score: -Infinity },
+    Thursday: { startTime: null, score: -Infinity },
+    Friday: { startTime: null, score: -Infinity },
+    Saturday: { startTime: null, score: -Infinity },
+    Sunday: { startTime: null, score: -Infinity },
+  };
+
+  // Calculate the best 3-hour window for the entire week.
+  // We loop from index 0 to 165 so that a 3-hour window (i, i+1, i+2) fits within 168.
+  for (let i = 0; i <= 168 - 3; i++) {
+    let windowScore = 0;
+    let valid = true;
+    for (let j = 0; j < 3; j++) {
+      // Check that the aligned renewable data exists at this index.
+      if (!alignedRenewable[i + j]) {
+        valid = false;
+        break;
+      }
+      windowScore += alignedRenewable[i + j].estimatedenergy / powerdata[i + j].active_power_avg;
     }
-  
-    // Determine the offset.
-    // renewabledata[0] is the current day (e.g., Tuesday 00:00),
-    // while powerdata[0] is always Monday 00:00.
-    // So if renewabledata starts on Tuesday, offset = 24 (i.e. Tuesday in powerdata is at index 24).
-    let renewableStartDay = getDayName(renewabledata[0].dateandtime);
-    let offset = days.indexOf(renewableStartDay) * 24;
-  
-    // Initialize best window records: weekly and for each day.
-    const bestWindows = {
-      Weekly: { startTime: null, score: -Infinity },
-      Monday: { startTime: null, score: -Infinity },
-      Tuesday: { startTime: null, score: -Infinity },
-      Wednesday: { startTime: null, score: -Infinity },
-      Thursday: { startTime: null, score: -Infinity },
-      Friday: { startTime: null, score: -Infinity },
-      Saturday: { startTime: null, score: -Infinity },
-      Sunday: { startTime: null, score: -Infinity },
-    };
-  
-    // Calculate the best weekly 3-hour window.
-    // For each possible 3-hour window in renewabledata, compute the score by summing:
-    // estimatedenergy / corresponding powerdata.active_power_avg,
-    
-    for (let i = 0; i <= renewabledata.length - 3; i++) {
-      let windowScore = 0;
-      for (let j = 0; j < 3; j++) {
-        let powerIndex = (i + j + offset) % powerdata.length;
-        windowScore += renewabledata[i + j].estimatedenergy / powerdata[powerIndex].active_power_avg;
-      }
-      if (windowScore > bestWindows.Weekly.score) {
-        bestWindows.Weekly.score = windowScore;
-        bestWindows.Weekly.startTime = renewabledata[i].dateandtime;
-      }
+    if (!valid) continue;
+    if (windowScore > bestWindows.Weekly.score) {
+      bestWindows.Weekly.score = windowScore;
+      bestWindows.Weekly.startTime = alignedRenewable[i].dateandtime;
     }
-  
-    // Calculate the best 3-hour window for each day.
-    // Here we ensure that when mapping renewabledata indices to powerdata using the offset,
-    // all three hours belong to the same day in the powerdata.
-    for (let i = 0; i <= renewabledata.length - 3; i++) {
-      // Determine the day for the first hour of the window (from powerdata perspective)
-      let powerIndex0 = (i + offset) % powerdata.length;
-      let dayName = getDayName(powerdata[powerIndex0].date_time);
-      
-      // Check that the next two hours in the window are on the same day
-      let powerIndex1 = (i + 1 + offset) % powerdata.length;
-      let powerIndex2 = (i + 2 + offset) % powerdata.length;
-      if (
-        getDayName(powerdata[powerIndex1].date_time) !== dayName ||
-        getDayName(powerdata[powerIndex2].date_time) !== dayName
-      ) {
-        continue; // Skip this window if it spans two days in powerdata
-      }
-      
-      // Compute the window score
+  }
+
+  // Calculate the best 3-hour window for each day.
+  // In powerdata, each day is a block of 24 hours:
+  // Monday: indices 0-23, Tuesday: 24-47, etc.
+  for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+    let dayName = days[dayIndex];
+    let start = dayIndex * 24;
+    let end = start + 24; // exclusive end for this day
+    // Loop through each possible starting index within the day that allows a 3-hour window.
+    for (let i = start; i <= end - 3; i++) {
       let windowScore = 0;
+      let valid = true;
       for (let j = 0; j < 3; j++) {
-        let pIndex = (i + j + offset) % powerdata.length;
-        windowScore += renewabledata[i + j].estimatedenergy / powerdata[pIndex].active_power_avg;
+        if (!alignedRenewable[i + j]) {
+          valid = false;
+          break;
+        }
+        windowScore += alignedRenewable[i + j].estimatedenergy / powerdata[i + j].active_power_avg;
       }
-      
-      // Update the best window for this day if necessary
+      if (!valid) continue;
       if (windowScore > bestWindows[dayName].score) {
         bestWindows[dayName].score = windowScore;
-        bestWindows[dayName].startTime = renewabledata[i].dateandtime;
+        bestWindows[dayName].startTime = alignedRenewable[i].dateandtime;
       }
     }
-  
-    return bestWindows;
   }
+
+  return bestWindows;
+}
+
+
 
 
 
