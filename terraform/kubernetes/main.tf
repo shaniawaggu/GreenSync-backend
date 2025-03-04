@@ -1,9 +1,5 @@
 provider "azurerm" {
   features {}
-<<<<<<< HEAD
-=======
-
->>>>>>> 57f9966f0a374bd82864634709ee299fd68eec84
 }
 
 resource "azurerm_resource_group" "aks_rg" {
