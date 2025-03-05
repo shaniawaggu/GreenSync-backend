@@ -70,7 +70,7 @@ class Forecast {
                 if (data.hourly.wind_speed_120m[i] < 3){
                     windspeed = 0
                 }else if(data.hourly.wind_speed_120m[i] < 35){
-                    windfactor = ((data.hourly.wind_speed_120m[i] - 3)/12)
+                    windfactor = ((data.hourly.wind_speed_120m[i] - 3)/17)//was 12 now 17
                     windspeed = 9.646 * windfactor * windfactor * windfactor
                 }else{
                     windspeed = 9.646
@@ -82,7 +82,7 @@ class Forecast {
                 EasternExport * (results[2].data.hourly.shortwave_radiation_instant[i]/1000)
                 * (1 - (0.92 * (results[2].data.hourly.cloud_cover[i] / 100))))
                 expectedExport[i] = windspeed + expectedSolarExport[i]
-                console.log(expectedExport[0], windspeed, expectedSolarExport[0]);
+                // console.log(expectedExport[0], windspeed, expectedSolarExport[0]);
                 let response = await db.query(
                     'INSERT INTO forecasts (dateAndTime, estimatedEnergy, windEnergy, solarEnergy) VALUES ($1, $2, $3, $4) RETURNING *;',
                     [results[0].data.hourly.time[i], expectedExport[i], windspeed, expectedSolarExport[i]]
