@@ -6,6 +6,7 @@ const db = require("../db/connect");
 const scheduleUserEmails = async () => {
   try {
     const response = await db.query("SELECT * FROM users;");
+<<<<<<< HEAD
     let response2
     const users = response.rows;
     const options = {
@@ -37,6 +38,17 @@ const scheduleUserEmails = async () => {
         \n  Best on Friday: ${windows.Friday.startTime}
         \n  Best on Saturday: ${windows.Saturday.startTime}
         \n  Best on Sunday: ${windows.Sunday.startTime}
+=======
+    const users = response.rows;
+
+    users.forEach((user) => {
+        const cron_expression = "* * * * *" // every minute
+        // const cron_expression = "0 9 * * 0" // every Sunday at 9:00 AM
+
+        let message = `Hello ${user.name},
+        \n\n
+        \n  ${user.message}
+>>>>>>> f60c3c15173f62cdb9487c48928965ef2b4b1c5d
         \n
         \n
         \nBest regards,
@@ -53,6 +65,7 @@ const scheduleUserEmails = async () => {
   }
 };
 
+<<<<<<< HEAD
 async function fetchOptimalPoints() {
   try {
       const response = await fetch(`http://131.145.0.127:3000/forecasts/optimal-windows`);
@@ -68,4 +81,6 @@ async function fetchOptimalPoints() {
   }
 }
 
+=======
+>>>>>>> f60c3c15173f62cdb9487c48928965ef2b4b1c5d
 module.exports = { scheduleUserEmails }

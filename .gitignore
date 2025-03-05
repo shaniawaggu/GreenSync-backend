@@ -1,9 +1,17 @@
 node_modules
 npm-debug.log
 .env
+<<<<<<< HEAD
 *.terraform
 .terraform.lock.hcl
 *.terraform.tfstate
 *.terraform.tfstate.backup
 .terraform/
 **/.terraform/
+=======
+.DS_Store
+.terraform
+.terraform.lock.hcl
+*.terraform.tfstate
+*.terraform.tfstate.backup
+>>>>>>> f60c3c15173f62cdb9487c48928965ef2b4b1c5d

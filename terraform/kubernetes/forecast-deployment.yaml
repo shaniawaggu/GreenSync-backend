@@ -57,7 +57,11 @@ spec:
     spec:
       containers:
       - name: forecast-mvc
+<<<<<<< HEAD
         image: htflynn/forecast-mvc:0.0.9.RELEASE
+=======
+        image: htflynn/forecast-mvc:0.0.3.RELEASE
+>>>>>>> f60c3c15173f62cdb9487c48928965ef2b4b1c5d
         ports:
         - containerPort: 3000
         env:
@@ -75,8 +79,11 @@ spec:
           value: "A8F4F4425AF16F49D2647B01D30D9355AB867C630C7640BF2E697B591634E4C5"
         - name: BCRYPT_SALT_ROUNDS
           value: "10"
+<<<<<<< HEAD
         - name: EMAIL_PASS 
           value: "nnhm drox owdg pzex"
+=======
+>>>>>>> f60c3c15173f62cdb9487c48928965ef2b4b1c5d
         # Optionally add a readiness probe if needed:
         # readinessProbe:
         #   httpGet:

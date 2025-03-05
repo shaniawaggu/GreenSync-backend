@@ -1,7 +1,11 @@
 version: '3.9'
 services:
   forecast-mvc:
+<<<<<<< HEAD
     image: htflynn/forecast-mvc:0.0.6.RELEASE
+=======
+    image: skamat2006/forecast-mvc
+>>>>>>> f60c3c15173f62cdb9487c48928965ef2b4b1c5d
     ports:
       - "3000:3000"
     restart: always
