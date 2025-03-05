@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   forecast-mvc:
-    image: htflynn/forecast-mvc:0.0.2.RELEASE
+    image: skamat2006/forecast-mvc
     ports:
       - "3000:3000"
     restart: always
@@ -17,6 +17,7 @@ services:
       DB_PORT: 5432
       SECRET_TOKEN: A8F4F4425AF16F49D2647B01D30D9355AB867C630C7640BF2E697B591634E4C5
       BCRYPT_SALT_ROUNDS: 10
+      EMAIL_PASS: "nnhm drox owdg pzex"
 
   forecast-db:
     image: htflynn/forecast-db:0.0.1.RELEASE
