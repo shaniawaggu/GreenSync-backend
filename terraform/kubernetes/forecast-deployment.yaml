@@ -1,0 +1,98 @@
+# forecast-db Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forecast-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forecast-db
+  template:
+    metadata:
+      labels:
+        app: forecast-db
+    spec:
+      containers:
+      - name: forecast-db
+        image: htflynn/forecast-db:0.0.1.RELEASE
+        ports:
+        - containerPort: 5432
+        # Optionally add a readiness probe if needed:
+        # readinessProbe:
+        #   tcpSocket:
+        #     port: 5432
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+
+---
+# forecast-db Service (internal access only)
+apiVersion: v1
+kind: Service
+metadata:
+  name: forecast-db-service
+spec:
+  selector:
+    app: forecast-db
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
+
+---
+# forecast-mvc Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forecast-mvc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: forecast-mvc
+  template:
+    metadata:
+      labels:
+        app: forecast-mvc
+    spec:
+      containers:
+      - name: forecast-mvc
+        image: htflynn/forecast-mvc:0.0.3.RELEASE
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DB_USER
+          value: "postgres"
+        - name: DB_HOST
+          value: "forecast-db-service"   # references the DB Service name
+        - name: DB_NAME
+          value: "forecast"
+        - name: DB_PASSWORD
+          value: "docker"
+        - name: DB_PORT
+          value: "5432"
+        - name: SECRET_TOKEN
+          value: "A8F4F4425AF16F49D2647B01D30D9355AB867C630C7640BF2E697B591634E4C5"
+        - name: BCRYPT_SALT_ROUNDS
+          value: "10"
+        # Optionally add a readiness probe if needed:
+        # readinessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 3000
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+
+---
+# forecast-mvc Service (exposes the MVC app externally)
+apiVersion: v1
+kind: Service
+metadata:
+  name: forecast-mvc-service
+spec:
+  selector:
+    app: forecast-mvc
+  ports:
+  - port: 3000
+    targetPort: 3000
+  type: LoadBalancer
